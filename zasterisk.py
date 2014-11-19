@@ -1,4 +1,4 @@
-#!/usr/bin/python2.6
+#!/usr/bin/python
 import pexpect
 import time
 import sys
@@ -8,10 +8,45 @@ from optparse import OptionParser, OptionGroup
 parser = OptionParser("usage=%prog [options] filename", version="%prog 0.1")
 parser.add_option("--channelsactive", action="store_true", dest="channelsactive", help="Print the total number of channels active.")
 parser.add_option("--callsactive", action="store_true", dest="callsactive", help="Print the total number of active calls.")
-parser.add_option("--skypeactive", action="store_true", dest="skypeactive", help="Print the total number of Active Skype channels. Print -1 if the module is not active.")
-parser.add_option("--g729activeenc", action="store_true", dest="g729activeenc", help="Print the total number of Active g729 Encoders. Print -1 if the module is not active.")
-parser.add_option("--g729activedec", action="store_true", dest="g729activedec", help="Print the total number of Active g729 Decoders. Print -1 if the module is not active.")
-parser.add_option("--skypelicense", action="store_true", dest="skypelicense", help="Print the total number of Active Skype channels. Print -1 if the module is not active.")
+
+parser.add_option("--agents", action="store_true", dest="agents", help="Lists agents and their status.")
+parser.add_option("--coresettings", action="store_true", dest="coresettings", help="Show PBX core settings (version etc)")
+parser.add_option("--coreshowchannels", action="store_true", dest="coreshowchannels", help="List currently defined channels and some information about them.")
+parser.add_option("--corestatus", action="store_true", dest="corestatus", help="Query for Core PBX status.")
+parser.add_option("--dahdishowchannels", action="store_true", dest="dahdishowchannels", help="Show status of DAHDI channels.")
+parser.add_option("--iaxregistry", action="store_true", dest="iaxregistry", help="Show IAX registrations.")
+parser.add_option("--iaxpeers", action="store_true", dest="iaxpeers", help="List IAX peers.")
+parser.add_option("--mailboxcount", action="store_true", dest="mailboxcount", help="Checks a voicemail account for new messages. Returns number of urgent, new and old messages. Need Mailbox specified.")
+parser.add_option("--mailboxstatus", action="store_true", dest="mailboxstatus", help="Checks a voicemail account for status.")
+parser.add_option("--meetmelist", action="store_true", dest="meetmelist", help="Lists all users in a particular MeetMe conference.")
+parser.add_option("--parkedcalls", action="store_true", dest="parkedcalls", help="List parked calls.")
+parser.add_option("--queuerule", action="store_true", dest="queuerule", help="Print the Queue Rules")
+parser.add_option("--queuesummary", action="store_true", dest="queuesummary", help="Show queue summary.")
+parser.add_option("--queuestatus", action="store_true", dest="queuestatus", help="Show queue status")
+parser.add_option("--showdialplan", action="store_true", dest="showdialplan", help="Show dialplan contexts and extensions. Be aware that showing the full dialplan may take a lot of capacity.")
+parser.add_option("--sippeers", action="store_true", dest="sippeers", help="Lists SIP peers in text format with details on current status.")
+parser.add_option("--sipqualifypeer", action="store_true", dest="sipqualifypeer", help="Qualify a SIP peer.")
+parser.add_option("--sipshowpeer", action="store_true", dest="sipshowpeer", help="Show one SIP peer with details on current status.")
+parser.add_option("--sipshowregistry", action="store_true", dest="sipshowregistry", help="Lists all registration requests and status.")
+parser.add_option("--voicemailuserslist", action="store_true", dest="voicemailuserslist", help="List All Voicemail User Information.")
+parser.add_option("--confbridgelistrooms", action="store_true", dest="confbridgelistrooms", help="Lists data about all active conferences.")
+parser.add_option("--confbridgelist", action="store_true", dest="confbridgelist", help="Lists all users in a particular ConfBridge conference.")
+parser.add_option("--devicestatelist", action="store_true", dest="devicestatelist", help="This will list out all known device states in a sequence of DeviceStateChange events.")
+parser.add_option("--extensionstatelist", action="store_true", dest="extensionstatelist", help="This will list out all known extension states in a sequence of ExtensionStatus events.")
+parser.add_option("--faxstats", action="store_true", dest="faxstats", help="Responds with fax statistics")
+parser.add_option("--pjsipqualify", action="store_true", dest="pjsipqualify", help="Qualify a chan_pjsip endpoint.")
+parser.add_option("--pjsipshowendpoint", action="store_true", dest="pjsipshowendpoint", help="Detail listing of an endpoint and its objects.")
+parser.add_option("--pjsipshowendpoints", action="store_true", dest="pjsipshowendpoints", help="Lists PJSIP endpoints.")
+parser.add_option("--pjsipshowregistrationsinbound", action="store_true", dest="pjsipshowregistrationsinbound", help="Lists PJSIP inbound registrations.")
+parser.add_option("--pjsipshowregistrationsoutbound", action="store_true", dest="pjsipshowregistrationsoutbound", help="Lists PJSIP outbound registrations.")
+parser.add_option("--pjsipshowresourcelists", action="store_true", dest="pjsipshowresourcelists", help="Displays settings for configured resource lists.")
+parser.add_option("--pjsipshowsubscriptionsinbound", action="store_true", dest="pjsipshowsubscriptionsinbound", help="Lists subscriptions.")
+parser.add_option("--pjsipshowsubscriptionsoutbound", action="store_true", dest="pjsipshowsubscriptionsoutbound", help="Lists subscriptions.")
+parser.add_option("--presencestate", action="store_true", dest="presencestate", help="Check Presence State.")
+parser.add_option("--presencestatelist", action="store_true", dest="presencestatelist", help="List the current known presence states.")
+parser.add_option("--prishowspans", action="store_true", dest="prishowspans", help="Show status of PRI spans.")
+
+
 parser.add_option("--g729license", action="store_true", dest="g729license", help="Print the total number of Active g729 channels. Print -1 if the module is not active.")
 
 # Channel lists include up or down Skype channels
@@ -160,10 +195,6 @@ except:
     print "Unexpected error:", sys.exc_info()
     semaphore.release()
 
-#TODO: Perhaps fetch all data at once, store in a temp file, and then have script grab from that, and refresh data when stale.
-#http://code.activestate.com/recipes/546512/
-#http://dwiel.net/blog/single-instance-application-with-command-line-interface/
-#http://docs.python.org/library/multiprocessing.html#using-a-pool-of-workers
-#http://stackoverflow.com/questions/2031121/detect-if-a-process-is-already-running-and-collaborate-with-it
-#http://linux.die.net/man/7/sem_overview
+#TODO:
+
 
