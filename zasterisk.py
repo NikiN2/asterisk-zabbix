@@ -8,7 +8,6 @@ from optparse import OptionParser, OptionGroup
 parser = OptionParser("usage=%prog [options] filename", version="%prog 0.1")
 parser.add_option("--channelsactive", action="store_true", dest="channelsactive", help="Print the total number of channels active.")
 parser.add_option("--callsactive", action="store_true", dest="callsactive", help="Print the total number of active calls.")
-
 parser.add_option("--agents", action="store_true", dest="agents", help="Lists agents and their status.")
 parser.add_option("--coresettings", action="store_true", dest="coresettings", help="Show PBX core settings (version etc)")
 parser.add_option("--coreshowchannels", action="store_true", dest="coreshowchannels", help="List currently defined channels and some information about them.")
@@ -46,16 +45,13 @@ parser.add_option("--presencestate", action="store_true", dest="presencestate", 
 parser.add_option("--presencestatelist", action="store_true", dest="presencestatelist", help="List the current known presence states.")
 parser.add_option("--prishowspans", action="store_true", dest="prishowspans", help="Show status of PRI spans.")
 
-
-parser.add_option("--g729license", action="store_true", dest="g729license", help="Print the total number of Active g729 channels. Print -1 if the module is not active.")
-
 # Channel lists include up or down Skype channels
 
 # Calls is not nearly as easy as it is in the CLI - show channels shows the number of calls, but the AMI doesn't show the number of calls, nor can it be discerned from the CoreShowChannels data. There's a workaround below, where the Channel has to be up to be considered live, and if two calls are bridged to each other, they are considered one call, but it's ugly.
 
 
 USERNAME = 'zabbix'
-PASSWORD = 'password'
+PASSWORD = 'mahapharata'
 
 (options, args) = parser.parse_args()
 
@@ -63,8 +59,8 @@ def connect_ami(semaphore):
     #TODO : Support astmanproxy or build own proxy to handle multiple simultaneous requests.
     semaphore.acquire()
     child=pexpect.spawn('telnet localhost 5038')
-    #child.logfile = sys.stdout
-    child.expect("Asterisk Call Manager/1.1\r\n",timeout=1)
+    child.logfile = sys.stdout
+    child.expect("Asterisk Call Manager/1.3\r\n",timeout=1)
     child.setecho(False)
     child.sendline("Action: Login")
     child.sendline("ActionID: 1")
@@ -76,73 +72,51 @@ def connect_ami(semaphore):
     child.expect("Events: Off\r")
     return child
 
-def check_module(child,modulename):
-    modules = { 
-            "Skype" : 'chan_skype.so',
-            "G729" : 'codec_g729a.so',
-            }
+#def check_module(child,modulename):
+#    modules = { 
+#            "Skype" : 'chan_skype.so',
+#            "G729" : 'codec_g729a.so',
+#            }
 
-    module = modules[modulename]
+#    module = modules[modulename]
 
-    child.sendline("Action: ModuleCheck")
-    child.sendline("Module: %s\r" % module)
-    i = child.expect(["Success\r","Error\r"])
-    if i == 0:
-        child.expect("Version: .+")
-        return True
-    else :
-        child.expect("Message: Module not loaded\r")
-        return False
+#    child.sendline("Action: ModuleCheck")
+#    child.sendline("Module: %s\r" % module)
+#    i = child.expect(["Success\r","Error\r"])
+#    if i == 0:
+#        child.expect("Version: .+")
+#        return True
+#    else :
+#        child.expect("Message: Module not loaded\r")
+#        return False
 #child = connect_ami(semaphore)
 #child.interact()
 
 semaphore=posix_ipc.Semaphore("/zasterisk",initial_value=1, flags=posix_ipc.O_CREAT)
 try:
-    if options.skypelicense:
-        child = connect_ami(semaphore)
-        if check_module(child,"Skype"):
-            child.sendline("Action: SkypeLicenseStatus\r")
-            child.expect('CallsLicensed: \d+\r',timeout=1)
-            result = child.after.split(' ')[1]
-        else:
-            result = "-1"
-    elif options.skypeactive:
-        child = connect_ami(semaphore)
-        if check_module(child,"Skype"):
-            child.sendline("Action: CoreShowChannels\r")
-            child.expect('ListItems: \d+\r',timeout=1)
-            result = child.before.count("\nChannel: Skype")
-        else:
-            result = "-1"        
-    elif options.g729license:
-        child = connect_ami(semaphore)
-        if check_module(child,"G729"):
-            child.sendline("Action: G729LicenseStatus\r")
-            child.expect('ChannelsLicensed: \d+\r',timeout=1)
-            result = child.after.split(' ')[1]
-        else:
-            result = "-1"
-    elif options.g729activeenc:
-        child = connect_ami(semaphore)
-        if check_module(child,"G729"):
-            child.sendline("Action: G729LicenseStatus\r")
-            child.expect('EncodersInUse: \d+\r',timeout=1)
-            result = child.after.split(' ')[1]
-        else:
-            result = "-1"
-    elif options.g729activedec:
-        child = connect_ami(semaphore)
-        if check_module(child,"G729"):
-            child.sendline("Action: G729LicenseStatus\r")
-            child.expect('DecodersInUse: \d+\r',timeout=1)
-            result = child.after.split(' ')[1]
-        else:
-            result = "-1"        
-    elif options.channelsactive:
+
+    if options.channelsactive:
         child = connect_ami(semaphore)
         child.sendline("Action: CoreShowChannels\r")
         child.expect('ListItems: \d+\r',timeout=1)
         result = child.after.split(' ')[1]
+
+    elif options.agents:
+        child = connect_ami(semaphore)
+        child.sendline("Action: Agents\r")
+        child.expect('Message: Agents will follow\r',timeout=1)
+        child.expect('Event: AgentsComplete\r',timeout=1)
+        child.expect('ListItems: \d+\r',timeout=1)
+        result = child.after.split(' ')[1]
+
+    elif options.coresettings:
+        child = connect_ami(semaphore)
+        child.sendline("Action: CoreSettings\r")
+        child.expect('AsteriskVersion: \d+\r',timeout=1)
+#        child.expect('AsteriskVersion: \d+\r',timeout=1)
+        result = (child"")[1]
+
+
     elif options.callsactive:
         child = connect_ami(semaphore)
         child.sendline("Action: CoreShowChannels\r")
@@ -196,5 +170,4 @@ except:
     semaphore.release()
 
 #TODO:
-
 
