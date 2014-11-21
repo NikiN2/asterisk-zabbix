@@ -41,6 +41,7 @@ Zabbix Agent
 Add the following lines to your Zabbix Agent config.
 
 UserParameter=asterisk.activeskypechannels,/etc/zabbix/zasterisk.py --skypeactive
+
 UserParameter=asterisk.activecalls,/etc/zabbix/zasterisk.py --callsactive
 UserParameter=asterisk.activechannels,/etc/zabbix/zasterisk.py --channelsactive
 UserParameter=asterisk.totalskypechannels,/etc/zabbix/zasterisk.py --skypelicense
