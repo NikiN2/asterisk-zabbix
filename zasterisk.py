@@ -6,6 +6,21 @@ import posix_ipc
 from optparse import OptionParser, OptionGroup
 
 parser = OptionParser("usage=%prog [options] filename", version="%prog 0.1")
+
+
+#
+#Правила LLD сканиррования
+#
+parser.add_option("--trunks", action="store_true", dest="trunks", help="Print t.")
+parser.add_option("--users", action="store_true", dest="users", help="Print t.")
+parser.add_option("--IAX2", action="store_true", dest="IAX2", help="Print t.")
+parser.add_option("--queues", action="store_true", dest="queues", help="Print t.")
+parser.add_option("--queues.members", action="store_true", dest="queues.members", help="Print t.")
+parser.add_option("--voicemail", action="store_true", dest="voicemail", help="Print t.")
+parser.add_option("--meetme", action="store_true", dest="meetme", help="Print t.")
+parser.add_option("--dahdi", action="store_true", dest="dahdi", help="Print t.")
+#
+
 parser.add_option("--channelsactive", action="store_true", dest="channelsactive", help="Print the total number of channels active.")
 parser.add_option("--callsactive", action="store_true", dest="callsactive", help="Print the total number of active calls.")
 parser.add_option("--agents", action="store_true", dest="agents", help="Lists agents and their status.")
