@@ -22,6 +22,12 @@ parser.add_option("--dahdi", action="store_true", dest="dahdi", help="Print .")
 #
 #Правила опроса SIP провайдеров
 #
+#UserParameter=asterisk.trunk.ip[*],/etc/zabbix/zasterisk.py --trunk.ip $1
+#UserParameter=asterisk.trunk.qualify[*],/etc/zabbix/zasterisk.py --trunk.qualify $1
+#UserParameter=asterisk.trunk.registry[*],/etc/zabbix/zasterisk.py --trunk.registry $1
+#UserParameter=asterisk.trunk.all.count[*],/etc/zabbix/zasterisk.py --trunk.all.count $1
+# как передать кроме опции переменную с названием трунка которая нужна далее для парсинга инфы из астера
+
 parser.add_option("--trunk.ip", action="store_true", dest="trunk.ip", help="Get trunk IP.")
 parser.add_option("--trunk.qualify", action="store_true", dest="trunk.qualify", help="Get trunk qualify")
 parser.add_option("--trunk.registry", action="store_true", dest="trunk.registry", help="Get trunk registry status")
@@ -139,6 +145,144 @@ try:
         child.expect('AsteriskVersion: \d+\r',timeout=1)
 #        child.expect('AsteriskVersion: \d+\r',timeout=1)
         result = (child"")[1]
+
+#
+#
+# Тут сканируем трунки
+#
+    elif options.trunks:
+        child = connect_ami(semaphore)
+        child.sendline("Action: SIPshowregistry\r")
+#        child.expect('AsteriskVersion: \d+\r',timeout=1)
+#        result = (child"")[1]
+# Пример вывода списка трунков
+# Response: Success
+# EventList: start
+# Message: Registrations will follow
+
+# Event: RegistryEntry
+# Host: 192.168.0.149
+# Port: 5060
+# Username: aster
+# Domain: 192.168.0.149
+# DomainPort: 5060
+# Refresh: 105
+# State: Registered
+# RegistrationTime: 1417625972
+#
+# Event: RegistryEntry
+# Host: sip.globalalania.ru
+# Port: 5060
+# Username: 700600
+# Domain: sip.globalalania.ru
+# DomainPort: 5060
+# Refresh: 105
+# State: Registered
+# RegistrationTime: 1417625888
+#
+# Event: RegistrationsComplete
+# EventList: Complete
+# ListItems: 2
+##############
+# вот что надо отправить забиксу
+#
+#         "data":[
+#                 {"{#TRUNKNAME}":"msk"},
+#                 {"{#TRUNKNAME}":"111"},
+#                 {"{#TRUNKNAME}":"122"},
+#                 {"{#TRUNKNAME}":"123"}
+# ]}
+#
+# Тут смотрим ип транка
+#
+    elif options.trunk.ip:
+        child = connect_ami(semaphore)
+        child.sendline("Action: SIPpeers\r")
+#        child.expect('AsteriskVersion: \d+\r',timeout=1)
+#        result = (child"")[1]
+# Пример вывода списка трунков
+
+# Response: Success
+# EventList: start
+# Message: Peer status list will follow
+#
+# Event: PeerEntry
+# Channeltype: SIP
+# ObjectName: 129
+# ChanObjectType: peer
+# IPaddress: -none-
+# IPport: 0
+# Dynamic: yes
+# AutoForcerport: yes
+# Forcerport: no
+# AutoComedia: no
+# Comedia: no
+# VideoSupport: no
+# TextSupport: no
+# ACL: no
+# Status: UNKNOWN
+# RealtimeDevice: no
+# Description:
+#
+# Event: PeerEntry
+# Channeltype: SIP
+# ObjectName: 130
+# ChanObjectType: peer
+# IPaddress: -none-
+# IPport: 0
+# Dynamic: yes
+# AutoForcerport: yes
+# Forcerport: no
+# AutoComedia: no
+# Comedia: no
+# VideoSupport: no
+# TextSupport: no
+# ACL: no
+# Status: UNKNOWN
+# RealtimeDevice: no
+# Description:
+#
+# Event: PeerEntry
+# Channeltype: SIP
+# ObjectName: aster
+# ChanObjectType: peer
+# IPaddress: 192.168.0.149
+# IPport: 5060
+# Dynamic: no
+# AutoForcerport: no
+# Forcerport: no
+# AutoComedia: no
+# Comedia: no
+# VideoSupport: no
+# TextSupport: no
+# ACL: no
+# Status: OK (2 ms)
+# RealtimeDevice: no
+# Description:
+#
+# Event: PeerEntry
+# Channeltype: SIP
+# ObjectName: globalalania
+# ChanObjectType: peer
+# IPaddress: 78.110.144.5
+# IPport: 5060
+# Dynamic: no
+# AutoForcerport: no
+# Forcerport: yes
+# AutoComedia: no
+# Comedia: yes
+# VideoSupport: no
+# TextSupport: no
+# ACL: no
+# Status: Unmonitored
+# RealtimeDevice: no
+# Description:
+#
+# Event: PeerlistComplete
+# EventList: Complete
+# ListItems: 33
+# Вот что надо отдать забиксу
+# 78.110.144.5
 
 
     elif options.callsactive:
