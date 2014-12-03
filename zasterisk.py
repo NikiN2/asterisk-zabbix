@@ -11,15 +11,24 @@ parser = OptionParser("usage=%prog [options] filename", version="%prog 0.1")
 #
 #Правила LLD сканиррования
 #
-parser.add_option("--trunks", action="store_true", dest="trunks", help="Print t.")
-parser.add_option("--users", action="store_true", dest="users", help="Print t.")
-parser.add_option("--IAX2", action="store_true", dest="IAX2", help="Print t.")
-parser.add_option("--queues", action="store_true", dest="queues", help="Print t.")
-parser.add_option("--queues.members", action="store_true", dest="queues.members", help="Print t.")
-parser.add_option("--voicemail", action="store_true", dest="voicemail", help="Print t.")
-parser.add_option("--meetme", action="store_true", dest="meetme", help="Print t.")
-parser.add_option("--dahdi", action="store_true", dest="dahdi", help="Print t.")
+parser.add_option("--trunks", action="store_true", dest="trunks", help="Discovery trunks.")
+parser.add_option("--users", action="store_true", dest="users", help="Discovery SIP users.")
+parser.add_option("--IAX2", action="store_true", dest="IAX2", help="Print .")
+parser.add_option("--queues", action="store_true", dest="queues", help="Print .")
+parser.add_option("--queues.members", action="store_true", dest="queues.members", help="Print .")
+parser.add_option("--voicemail", action="store_true", dest="voicemail", help="Print .")
+parser.add_option("--meetme", action="store_true", dest="meetme", help="Print .")
+parser.add_option("--dahdi", action="store_true", dest="dahdi", help="Print .")
 #
+#Правила опроса SIP провайдеров
+#
+parser.add_option("--trunk.ip", action="store_true", dest="trunk.ip", help="Get trunk IP.")
+parser.add_option("--trunk.qualify", action="store_true", dest="trunk.qualify", help="Get trunk qualify")
+parser.add_option("--trunk.registry", action="store_true", dest="trunk.registry", help="Get trunk registry status")
+parser.add_option("--trunk.all.count", action="store_true", dest="trunk.all.count", help="Get total number of trunk")
+
+
+
 
 parser.add_option("--channelsactive", action="store_true", dest="channelsactive", help="Print the total number of channels active.")
 parser.add_option("--callsactive", action="store_true", dest="callsactive", help="Print the total number of active calls.")
