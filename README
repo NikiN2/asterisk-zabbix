@@ -1,5 +1,16 @@
-<<<<<<< HEAD
 #Usage
+Настройки подключения находятся в settings.py
+Зависимости проекта находятся в файле freeze
+
+Доступные команды:
+ ./run.py registry -a                           Discovery trunks.
+ ./run.py peer -a                               Discovery users.
+ ./run.py peer -f <field_name> -n <username>    Return the name of the field
+
+в параметре -f можно указать любой возвращаемый параметр возвращаемый SIPpeers, доступные перечислены в файле peer.py
+пример ./run.py peer -f Address-IP -n 103 - вернет значение поля Address-IP
+
+
 ПЕРЕПИСАТЬ !!!!!
 
 
@@ -61,7 +72,7 @@ Add your content here. Format your content with:
 Text in bold or italic
 Headings, paragraphs, and lists
 Automatic links to other wiki pages
-=======
+
 
 ```
 #!python
@@ -128,4 +139,3 @@ Text in bold or italic
 Headings, paragraphs, and lists
 Automatic links to other wiki pages
 ```
->>>>>>> 03121e803e50af64bfa2811fa380ef69a013ce4e
