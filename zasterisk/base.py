@@ -62,20 +62,10 @@ class BaseCommand:
             ami.close()
         finally:
             self.semaphore.release()
+            self.semaphore.unlink()
 
     def handle(self, ami, *args, **options):
         raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
-
-    @staticmethod
-    def parse_line(line):
-        match = PATTERN_LINE.match(line)
-        if match:
-            return match.group("key"), match.group("value")
-        return None
-
-    def get_all(self, connect):
-        while True:
-            self.stdout.write(connect.readline())
 
     def parse_events(self, connect, event_name):
         is_event = False
@@ -95,14 +85,34 @@ class BaseCommand:
                 is_event = True
 
             if is_event:
-                pair = self.parse_line(line)
+                pair = self.parse_field_line(line)
                 if pair:
                     key, value = pair
                     current_event[key] = value
         return events
 
     @staticmethod
-    def get_discovery(items, param_name, key_name):
+    def parse_field_line(line):
+        match = PATTERN_LINE.match(line)
+        if match:
+            return match.group("key"), match.group("value")
+        return None
+
+
+class DiscoveryCommand(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument("--all", "-a", dest='discovery', action='store_true', help="Discovery trunks.")
+        BaseCommand.add_arguments(self, parser)
+
+    def discovery(self, ami):
+        raise NotImplementedError('subclasses of DiscoveryCommand must provide a discovery() method')
+
+    def handle(self, ami, *args, **options):
+        discovery = options.get('discovery')
+        if discovery:
+            return self.discovery(ami)
+
+    def create_discovery(self, items, param_name, key_name):
         result = []
         for item in items:
             value = item.get(key_name)
@@ -110,8 +120,31 @@ class BaseCommand:
                 result.append({param_name: value})
         return json.dumps({"data": result})
 
-    @staticmethod
-    def expect_field(connect, field_name, timeout):
+
+class FieldCommand(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument("--field", "-f", dest='field', help="Return the name of the field")
+        parser.add_argument("--param", "-p", dest='param', help="Filter parameter")
+        parser.add_argument("--regex", "-r", dest='regex', help="Regular expression for field value. (Return group 1)")
+        BaseCommand.add_arguments(self, parser)
+
+    def handle(self, ami, *args, **options):
+        field = options.get('field')
+        param = options.get("param")
+        regex = options.get("regex")
+
+        if field and param:
+            result = self.get_field(ami, field, param)
+            if regex:
+                match = re.search(regex, result)
+                if match:
+                    return match.group(1)
+            return result
+
+    def get_field(self, ami, field_name, param):
+        raise NotImplementedError('subclasses of FieldCommand must provide a get_field() method')
+
+    def expect_field(self, connect, field_name, timeout):
         try:
             connect.expect("%s: (.*?)\r" % field_name, timeout=timeout)
             if connect.match:
@@ -120,3 +153,13 @@ class BaseCommand:
                 return "Field '%s' not found" % field_name
         except Exception:
             return "Field '%s' not found" % field_name
+
+
+class DiscoveryFieldCommand(DiscoveryCommand, FieldCommand):
+    def add_arguments(self, parser):
+        DiscoveryCommand.add_arguments(self, parser)
+        FieldCommand.add_arguments(self, parser)
+
+    def handle(self, ami, *args, **options):
+        return DiscoveryCommand.handle(self, ami, *args, **options) or FieldCommand.handle(self, ami, *args, **options)
+

@@ -1,25 +1,26 @@
 # coding=utf-8
-from zasterisk.base import BaseCommand
+from zasterisk.base import DiscoveryFieldCommand
 
 
-class Command(BaseCommand):
+class Command(DiscoveryFieldCommand):
     help = '''
         SIP registrations
     '''
 
-    def add_arguments(self, parser):
-        parser.add_argument("--all", "-a", dest='discovery', action='store_true', help="Discovery trunks.")
-        BaseCommand.add_arguments(self, parser)
-
     def discovery(self, ami):
         def callback(connect, timeout):
             events = self.parse_events(connect, "RegistryEntry")
-            discovery = self.get_discovery(events, "{#TRUNKNAME}", "Username")
-            self.stdout.write(discovery)
+            return self.create_discovery(events, "{#TRUNKNAME}", "Username")
 
-        ami.execute("SIPshowregistry", {}, callback)
+        return ami.execute("SIPshowregistry", {}, callback)
 
-    def handle(self, ami, *args, **options):
-        discovery = options.get('discovery')
-        if discovery:
-            return self.discovery(ami)
+    def get_field(self, ami, field_name, param):
+        def callback(connect, timeout):
+            events = self.parse_events(connect, "RegistryEntry")
+            for event in events:
+                if event.get("Username") == param:
+                    return event.get(field_name)
+        result = ami.execute("SIPshowregistry", {}, callback)
+        if not result:
+            return "Field '%s' not found" % field_name
+        return result

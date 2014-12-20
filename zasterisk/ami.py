@@ -1,8 +1,6 @@
 # coding=utf-8
 import pexpect
-
-DEFAULT_TIMEOUT = 3
-AMI_VERSION = "1.3"
+from settings import DEFAULT_TIMEOUT, AMI_VERSION
 
 
 class AmiException(Exception):
