@@ -1,8 +1,8 @@
 # coding=utf-8
 
-HOST = ""
+HOST = "localhost"
 PORT = "5038"
-USERNAME = ""
+USERNAME = "zabbix"
 PASSWORD = ""
 DEFAULT_TIMEOUT = 3
 AMI_VERSION = "1.3"
