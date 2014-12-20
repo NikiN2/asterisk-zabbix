@@ -1,14 +1,23 @@
 #Usage
-Настройки подключения находятся в settings.py
+Настройки по умолчанию находятся в settings.py
+Необходимо создать файл local_settings.py и указать в нем настройки подключения
+ HOST = ""
+ PORT = ""
+ USERNAME = ""
+ PASSWORD = ""
+
 Зависимости проекта находятся в файле freeze
 
 Доступные команды:
- ./run.py registry -a                           Discovery trunks.
- ./run.py peer -a                               Discovery users.
- ./run.py peer -f <field_name> -n <username>    Return the name of the field
+ ./run.py <command> -a                                         Discovery.
+ ./run.py <command> -f <field_name> -p <param>                 Return the param of the field
+ ./run.py <command> -f <field_name> -p <param> -r <regex>      Regular expression for field value. (Return group 1)
 
-в параметре -f можно указать любой возвращаемый параметр возвращаемый SIPpeers, доступные перечислены в файле peer.py
-пример ./run.py peer -f Address-IP -n 103 - вернет значение поля Address-IP
+command - название команды
+param - параметр фильтрации
+field_name - название возвращаемого параметра
+regex - регулярное выражение применяемое к возвращаемому результату
+
 
 
 ПЕРЕПИСАТЬ !!!!!

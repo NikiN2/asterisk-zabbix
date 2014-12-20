@@ -1,8 +1,6 @@
 # coding=utf-8
 import pexpect
-
-DEFAULT_TIMEOUT = 3
-AMI_VERSION = "1.3"
+from . import settings
 
 
 class AmiException(Exception):
@@ -22,15 +20,15 @@ class TelnetAmi:
     def get_action_id(self):
         return ++self.action_id
 
-    def init(self, command, options, timeout=DEFAULT_TIMEOUT):
+    def init(self, command, options, timeout=settings.DEFAULT_TIMEOUT):
         self.connect = pexpect.spawn('telnet %s %s' % (self.host, self.port), timeout=timeout)
         verbosity = options.get("verbosity")
         if verbosity:
             self.connect.logfile = command.stdout
-        self.connect.expect("Asterisk Call Manager/%s\r\n" % AMI_VERSION, timeout=timeout)
+        self.connect.expect("Asterisk Call Manager/%s\r\n" % settings.AMI_VERSION, timeout=timeout)
         self.connect.setecho(False)
 
-    def login(self, timeout=DEFAULT_TIMEOUT):
+    def login(self, timeout=settings.DEFAULT_TIMEOUT):
         self.connect.sendline("Action: Login")
         self.connect.sendline("ActionID: %s" % self.get_action_id())
         self.connect.sendline("Username: %s" % self.username)
@@ -40,10 +38,10 @@ class TelnetAmi:
         self.connect.sendline("EventMask: Off\r")
         self.connect.expect("Events: Off\r", timeout=timeout)
 
-    def logoff(self, timeout=DEFAULT_TIMEOUT):
+    def logoff(self, timeout=settings.DEFAULT_TIMEOUT):
         self.connect.sendline("Action: Logoff\r", timeout=timeout)
 
-    def execute(self, action, params, callback, timeout=DEFAULT_TIMEOUT):
+    def execute(self, action, params, callback, timeout=settings.DEFAULT_TIMEOUT):
         self.connect.sendline("Action: %s" % action)
         self.connect.sendline("ActionID: %s" % self.get_action_id())
         for key, value in params.items():

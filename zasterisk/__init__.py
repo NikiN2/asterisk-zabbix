@@ -1,4 +1,5 @@
 # coding=utf-8
+import importlib
 import sys
 import os
 from argparse import ArgumentParser
@@ -85,3 +86,15 @@ class CommandUtility(object):
             sys.stdout.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(command_module).run_from_argv(ami, self.argv)
+
+
+class Settings:
+    def __init__(self, *modules):
+        for module_name in modules:
+            mod = importlib.import_module(module_name)
+            for setting in dir(mod):
+                if setting.isupper():
+                    setting_value = getattr(mod, setting)
+                    setattr(self, setting, setting_value)
+
+settings = Settings("settings", "local_settings")
