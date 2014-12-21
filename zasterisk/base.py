@@ -56,7 +56,7 @@ class BaseCommand:
             self.semaphore.acquire()
             ami.init(self, options)
             ami.login()
-            output = self.handle(ami, *args, **options)
+            output = str(self.handle(ami, *args, **options))
             if output:
                 self.stdout.write(output)
             ami.close()
@@ -102,15 +102,23 @@ class BaseCommand:
 class DiscoveryCommand(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--all", "-a", dest='discovery', action='store_true', help="Discovery trunks.")
+        parser.add_argument("--count", "-c", dest='count', action='store_true', help="Events count.")
         BaseCommand.add_arguments(self, parser)
 
     def discovery(self, ami):
         raise NotImplementedError('subclasses of DiscoveryCommand must provide a discovery() method')
 
+    def count(self, ami):
+        raise NotImplementedError('subclasses of DiscoveryCommand must provide a count() method')
+
     def handle(self, ami, *args, **options):
         discovery = options.get('discovery')
         if discovery:
             return self.discovery(ami)
+
+        count = options.get('count')
+        if count:
+            return self.count(ami)
 
     def create_discovery(self, items, param_name, key_name):
         result = []
