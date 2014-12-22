@@ -1,3 +1,23 @@
+Установка компонентов 
+
+
+Настрйока Asterisk 
+добавить в manager.conf 
+
+[zabbix]
+secret=zabbixsecpass
+deny=0.0.0.0/0.0.0.0
+permit=127.0.0.1/255.255.255.255
+read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan
+write = agent,user,command,reporting
+allowmultiplelogin = yes
+displayconnects = no
+writetimeout = 100
+
+secret поменять как и в файле settings.py 
+
+
+
 #Usage
 Настройки по умолчанию находятся в settings.py
 Необходимо создать файл local_settings.py и указать в нем настройки подключения
@@ -17,6 +37,13 @@ command - название команды
 param - параметр фильтрации
 field_name - название возвращаемого параметра
 regex - регулярное выражение применяемое к возвращаемому результату
+
+
+
+
+
+
+
 
 
 
