@@ -12,6 +12,6 @@ class Command(BaseCommand):
             connect.expect("Timestamp: ([\d\.]*)\r", timeout=timeout)
             match = connect.match
             if match:
-                self.stdout.write(match.group(1))
+                return match.group(1)
 
-        ami.execute("Ping", {}, callback)
+        return ami.execute("Ping", {}, callback)

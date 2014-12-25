@@ -4,23 +4,24 @@ from zasterisk.base import DiscoveryFieldCommand
 
 class Command(DiscoveryFieldCommand):
     help = '''
-        SIP registrations
+        SIP queue
     '''
 
     def discovery(self, ami):
         def callback(connect, timeout):
-            events = self.parse_events(connect)
-            return self.create_discovery(events.get("RegistryEntry"), "{#TRUNKNAME}", "Username")
+            events = self.parse_events(connect, "Event: QueueStatusComplete")
+            return self.create_discovery(events.get("QueueParams"), "{#QUEUENAME}", "Queue")
 
-        return ami.execute("SIPshowregistry", {}, callback)
+        return ami.execute("QueueStatus", {}, callback, False)
 
     def get_field(self, ami, field_name, param):
         def callback(connect, timeout):
-            events = self.parse_events(connect).get("RegistryEntry")
+            events = self.parse_events(connect, "Event: QueueStatusComplete").get("QueueParams")
             for event in events:
-                if event.get("Username") == param:
+                if event.get("Queue") == param:
                     return event.get(field_name)
-        result = ami.execute("SIPshowregistry", {}, callback)
+
+        result = ami.execute("QueueStatus", {}, callback)
         if not result:
             return "Field '%s' not found" % field_name
         return result

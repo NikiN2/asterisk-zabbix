@@ -38,25 +38,26 @@ class TelnetAmi:
         self.connect.sendline("EventMask: Off\r")
         self.connect.expect("Events: Off\r", timeout=timeout)
 
-    def logoff(self, timeout=settings.DEFAULT_TIMEOUT):
-        self.connect.sendline("Action: Logoff\r", timeout=timeout)
+    def logoff(self):
+        self.connect.sendline("Action: Logoff\r")
 
-    def execute(self, action, params, callback, timeout=settings.DEFAULT_TIMEOUT):
+    def execute(self, action, params, callback, check_result=True, timeout=settings.DEFAULT_TIMEOUT):
         self.connect.sendline("Action: %s" % action)
         self.connect.sendline("ActionID: %s" % self.get_action_id())
         for key, value in params.items():
             self.connect.sendline("%s: %s" % (key, value))
         self.connect.sendline()
-        status = self.connect.expect([
-                         "Response: Success\r",
-                         "Response: Error\r",
-                         "Response: Follows\r"], timeout=timeout)
-        if status == 1:
-            message = "Error AMI"
-            self.connect.expect("Message: (.*)\r")
-            if self.connect.match:
-                message = self.connect.match.group(1)
-            raise AmiException(message)
+
+        if check_result:
+            expects = ["Response: Success\r", "Response: Error\r", "Response: Follows\r"]
+            status = self.connect.expect(expects, timeout=timeout)
+            if status == 1:
+                message = "Error AMI"
+                self.connect.expect("Message: (.*)\r")
+                if self.connect.match:
+                    message = self.connect.match.group(1)
+                raise AmiException(message)
+
         return callback(self.connect, timeout)
 
     def close(self):
