@@ -11,6 +11,11 @@ from collections import defaultdict
 PATTERN_LINE = re.compile("(?P<key>\w+): (?P<value>.*)")
 
 
+class DummyLog(object):
+    def write(self, data):
+        pass
+
+
 class BaseCommand:
     help = ''
     args = ''
@@ -43,6 +48,10 @@ class BaseCommand:
         options = parser.parse_args(argv[2:])
         cmd_options = vars(options)
         args = cmd_options.pop('args', ())
+        verbosity = cmd_options.get("verbosity")
+        if not verbosity:
+            sys.stderr = DummyLog()
+            self.stderr = DummyLog()
         try:
             self.execute(ami, *args, **cmd_options)
         except Exception as e:
