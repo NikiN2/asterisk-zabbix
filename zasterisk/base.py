@@ -23,7 +23,7 @@ class BaseCommand:
     def __init__(self):
         self.semaphore = posix_ipc.Semaphore("/zasterisk_command", initial_value=1, flags=posix_ipc.O_CREAT)
         self.stdout = sys.stdout
-        sys.stderr = DummyLog()
+        self.stderr = sys.stderr
 
     def usage(self, command):
         usage = '%%prog %s [options] %s' % (command, self.args)
@@ -48,6 +48,10 @@ class BaseCommand:
         options = parser.parse_args(argv[2:])
         cmd_options = vars(options)
         args = cmd_options.pop('args', ())
+        verbosity = cmd_options.get("verbosity")
+        if not verbosity:
+            sys.stderr = DummyLog()
+            self.stderr = DummyLog()
         try:
             self.execute(ami, *args, **cmd_options)
         except Exception as e:
