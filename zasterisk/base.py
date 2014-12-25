@@ -11,6 +11,11 @@ from collections import defaultdict
 PATTERN_LINE = re.compile("(?P<key>\w+): (?P<value>.*)")
 
 
+class DummyLog(object):
+    def write(self, data):
+        pass
+
+
 class BaseCommand:
     help = ''
     args = ''
@@ -18,7 +23,7 @@ class BaseCommand:
     def __init__(self):
         self.semaphore = posix_ipc.Semaphore("/zasterisk_command", initial_value=1, flags=posix_ipc.O_CREAT)
         self.stdout = sys.stdout
-        self.stderr = sys.stderr
+        sys.stderr = DummyLog()
 
     def usage(self, command):
         usage = '%%prog %s [options] %s' % (command, self.args)
