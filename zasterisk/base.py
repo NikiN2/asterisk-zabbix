@@ -5,6 +5,8 @@ import re
 import json
 from argparse import ArgumentParser
 import posix_ipc
+from collections import defaultdict
+
 
 PATTERN_LINE = re.compile("(?P<key>\w+): (?P<value>.*)")
 
@@ -67,7 +69,8 @@ class BaseCommand:
     def handle(self, ami, *args, **options):
         raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
 
-    def parse_events(self, connect, event_name):
+    def parse_events(self, connect, end_line="EventList: Complete"):
+        result = defaultdict(list)
         is_event = False
         events = []
         current_event = {}
@@ -79,9 +82,9 @@ class BaseCommand:
                     current_event = {}
                 is_event = False
                 continue
-            if line == "EventList: Complete":
+            if line == end_line:
                 break
-            if line == "Event: %s" % event_name:
+            if line.startswith("Event:"):
                 is_event = True
 
             if is_event:
@@ -89,7 +92,12 @@ class BaseCommand:
                 if pair:
                     key, value = pair
                     current_event[key] = value
-        return events
+
+        for event in events:
+            event_name = event.get("Event")
+            result[event_name].append(event)
+
+        return result
 
     @staticmethod
     def parse_field_line(line):
@@ -169,5 +177,7 @@ class DiscoveryFieldCommand(DiscoveryCommand, FieldCommand):
         FieldCommand.add_arguments(self, parser)
 
     def handle(self, ami, *args, **options):
-        return DiscoveryCommand.handle(self, ami, *args, **options) or FieldCommand.handle(self, ami, *args, **options)
-
+        output = DiscoveryCommand.handle(self, ami, *args, **options)
+        if not output:
+            output = FieldCommand.handle(self, ami, *args, **options)
+        return output

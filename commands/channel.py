@@ -9,6 +9,9 @@ class Command(DiscoveryCommand):
 
     def count(self, ami):
         def callback(connect, timeout):
-            events = self.parse_events(connect, "CoreShowChannel")
-            return len(events)
+            events = self.parse_events(connect)
+            return len(events.get("CoreShowChannel"))
         return ami.execute("CoreShowChannels", {}, callback)
+
+    def discovery(self, ami):
+        return ""
