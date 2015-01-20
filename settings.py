@@ -2,7 +2,7 @@
 
 HOST = "localhost"
 PORT = "5038"
-USERNAME = ""
-PASSWORD = ""
+USERNAME = "zabbix"
+PASSWORD = "zabbixpasswordami"
 DEFAULT_TIMEOUT = 3
 AMI_VERSION = "1.3"
