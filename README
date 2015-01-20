@@ -1,5 +1,6 @@
 Dependency:          
 python 2.7+     
+python-all-dev
 Zabbix 2.4+    
 asterisk 1.8+    
 argparse 1.2.1+    
@@ -12,7 +13,7 @@ wsgiref 0.1.2+
 ```
 #!python
 
-aptitude install python-pip
+aptitude install python-pip python-all-dev
 pip install argparse pexpect posix-ipc wsgiref
 
 ```
