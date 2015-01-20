@@ -1,11 +1,11 @@
 Зависимости 
-python 2.7+
-Zabbix 2.4+
-asterisk 1.8+
-argparse 1.2.1+
-pexpect 3.3+
-posix-ipc 0.9.9+
-wsgiref 0.1.2+
+* python 2.7+
+* Zabbix 2.4+
+* asterisk 1.8+
+* argparse 1.2.1+
+* pexpect 3.3+
+* posix-ipc 0.9.9+
+* wsgiref 0.1.2+
 
 **Install python modules:**
 
@@ -65,22 +65,32 @@ Restart your Zabbix agent.
 #Usage
 
 Available commands:
- channel - CoreShowChannels
- member - SIP member
- peer - SIP peers
- ping - ping/pong.
- queue - SIP queue
- registry - SIP registrations
+*  channel - CoreShowChannels
+*  member - SIP member
+*  peer - SIP peers
+*  queue - SIP queue
+*  registry - SIP registrations
 
 Parameters 
+
+```
+#!python
+
  ./run.py <command> -a  Discovery.
  ./run.py <command> -f <field_name> -p <param>                 Return the param of the field
  ./run.py <command> -f <field_name> -p <param> -r <regex>      Regular expression for field value. (Return group 1)
  ./run.py <command> -v Verbose
+```
+
 
 Examples:
+
+
+```
+#!python
 
 sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py registry -a  Return all SIP Registrations 
 sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py registry -a  Return all SIP Peers 
 sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py peer -f Address-IP -p 101 Return ip address peer 101 
-sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py peer -f Status -r "(\d+)" -p 101   Return Qualify user 101 
+sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py peer -f Status -r "(\d+)" -p 101   Return Qualify user 101
+```
