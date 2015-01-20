@@ -97,4 +97,4 @@ class Settings:
                     setting_value = getattr(mod, setting)
                     setattr(self, setting, setting_value)
 
-settings = Settings("settings", "local_settings")
+settings = Settings("settings", "settings")
