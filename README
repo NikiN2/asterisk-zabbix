@@ -101,7 +101,7 @@ Examples:
 #!python
 
 sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py registry -a  Return all SIP Registrations 
-sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py registry -a  Return all SIP Peers 
+sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py peer -a  Return all SIP Peers 
 sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py peer -f Address-IP -p 101 Return ip address peer 101 
 sudo -u zabbix /etc/zabbix/asterisk-zabbix-py/run.py peer -f Status -r "(\d+)" -p 101   Return Qualify user 101
 ```
