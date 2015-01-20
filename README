@@ -1,12 +1,21 @@
 Dependency:          
 python 2.7+     
-python-all-dev
+python-all-dev     
 Zabbix 2.4+    
 asterisk 1.8+    
 argparse 1.2.1+    
 pexpect 3.3+    
 posix-ipc 0.9.9+    
 wsgiref 0.1.2+    
+
+** Install zabbix agent**
+
+```
+#!python
+
+aptitude install zabbix-agent
+```
+
 
 **Install python modules:**
 
