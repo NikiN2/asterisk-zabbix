@@ -1,11 +1,11 @@
-Зависимости 
-* python 2.7+
-* Zabbix 2.4+
-* asterisk 1.8+
-* argparse 1.2.1+
-* pexpect 3.3+
-* posix-ipc 0.9.9+
-* wsgiref 0.1.2+
+Зависимости      
+python 2.7+     
+Zabbix 2.4+    
+asterisk 1.8+    
+argparse 1.2.1+    
+pexpect 3.3+    
+posix-ipc 0.9.9+    
+wsgiref 0.1.2+    
 
 **Install python modules:**
 
@@ -60,16 +60,17 @@ Add the following lines to your Zabbix Agent config. (zabbix_agentd.conf)
 #!python
 Include=/etc/zabbix/asterisk-zabbix-py/userparameter_asterisk.conf
 ```
-Restart your Zabbix agent.
+Restart your Zabbix agent.    
 
 #Usage
 
 Available commands:
-*  channel - CoreShowChannels
-*  member - SIP member
-*  peer - SIP peers
-*  queue - SIP queue
-*  registry - SIP registrations
+    
+channel - CoreShowChannels    
+member - SIP member    
+peer - SIP peers    
+queue - SIP queue    
+registry - SIP registrations    
 
 Parameters 
 
