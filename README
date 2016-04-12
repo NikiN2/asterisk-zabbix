@@ -31,7 +31,7 @@ pip install argparse pexpect posix-ipc wsgiref
 ```
 #!python
 cd /etc/zabbix/
-git clone https://pbxware@bitbucket.org/pbxware/asterisk-zabbix-py.git
+git clone https://SimakinK@bitbucket.org/SimakinK/asterisk-zabbix.git
 cd asterisk-zabbix-py
 ```
 **Edit settings.py**
