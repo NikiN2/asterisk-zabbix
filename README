@@ -1,5 +1,5 @@
 Dependency:          
-python 2.7+     
+python 2.6+     
 python-all-dev     
 Zabbix 2.4+    
 asterisk 1.8+    
