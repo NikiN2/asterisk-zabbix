@@ -18,7 +18,8 @@ def get_commands(commands_path):
     commands = {}
     for command_dir in commands_path:
         module_name = os.path.basename(command_dir)
-        commands.update({name: module_name + "." + name for name in find_commands(command_dir)})
+	for name in find_commands(command_dir):
+                commands.update({name: module_name + "." + name})
     return commands
 
 
